@@ -9,13 +9,42 @@ if not API_KEY:
 
 API_URL = f"https://safebrowsing.googleapis.com/v4/threatMatches:find?key={API_KEY}"
 
-HTML_PAGE = """<html><body><h2>Google Safe Browsing URL Checker</h2>
-<form method="POST" action="/check">
-<input type="text" name="url" placeholder="Enter URL" required>
-<button type="submit">Check URL</button>
-</form>
-{% if result %}<p>{{ result.status }}</p><pre>{{ result.details }}</pre>{% endif %}
-</body></html>"""
+HTML_PAGE = """
+<!DOCTYPE html>
+<html>
+<head>
+    <title>URL Safety Checker</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background:#f4f6f8; display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:100vh; margin:0; }
+        .container { background:white; padding:40px; border-radius:12px; box-shadow:0 8px 20px rgba(0,0,0,0.1); max-width:500px; width:90%; text-align:center; }
+        h2 { color:#333; margin-bottom:25px; }
+        input[type="text"] { width:80%; padding:12px; border:1px solid #ccc; border-radius:8px; font-size:16px; margin-bottom:20px; }
+        button { padding:12px 25px; font-size:16px; border:none; border-radius:8px; background-color:#007BFF; color:white; cursor:pointer; transition:0.3s; }
+        button:hover { background-color:#0056b3; }
+        pre { background:#f0f0f0; padding:15px; border-radius:8px; text-align:left; overflow-x:auto; }
+        .result-safe { color: green; font-weight: bold; }
+        .result-unsafe { color: red; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🔎 Google Safe Browsing URL Checker</h2>
+        <form method="POST" action="/check">
+            <input type="text" name="url" placeholder="Enter URL here" required>
+            <br>
+            <button type="submit">Check URL</button>
+        </form>
+        {% if result %}
+            <h3>Result:</h3>
+            <p class="{{ 'result-unsafe' if result.status=='❌ Unsafe' else 'result-safe' }}">{{ result.status }}</p>
+            {% if show_details %}
+                <pre>{{ result.details }}</pre>
+            {% endif %}
+        {% endif %}
+    </div>
+</body>
+</html>
+"""
 
 @app.route("/", methods=["GET"])
 def home():
